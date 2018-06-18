@@ -14,6 +14,9 @@
 			this.id = id;
 
 			chrome.tabs.executeScript(this.id, {
+				file: 'mousetrap.js'
+			});
+			chrome.tabs.executeScript(this.id, {
 				file: 'prism.js'
 			});
 			chrome.tabs.executeScript(this.id, {
