@@ -62,12 +62,31 @@ var injected = injected || (function() {
     },
 
     registerEvents: function() {
-      document.addEventListener('mousemove', this.log);
-      document.addEventListener('scroll', this.layout);
-      window.addEventListener('resize', function(){
+        Mousetrap.bind(
+          "command+shift+k",
+          function(e) {
+            if (this.$target.parentNode) {
+              this.log({ target: this.$target.parentNode });
+            }
+            return false;
+          }.bind(this)
+        );
+        Mousetrap.bind(
+          "command+c",
+          function(e) {
+            this.copyToClipboard(this.$code.innerText);
+            return false;
+          }.bind(this)
+        );
+        document.addEventListener("mousemove", this.log);
+        document.addEventListener("scroll", this.layout);
+        window.addEventListener(
+          "resize",
+          function() {
         this.handleResize();
         this.layout();
-      }.bind(this));
+          }.bind(this)
+        );
     },
 
     log: function(e) {
@@ -75,24 +94,27 @@ var injected = injected || (function() {
 
       // check if element cached
       if (this.forbidden.indexOf(this.$target) !== -1) return;
-
-      this.stringified = this.serializer.serializeToString(this.$target);
-
-
+        this.stringified = this.$target.id ? this.$target.id : "NO ID";
       this.codeOutput();
 
       this.$cacheEl = this.$target;
       this.layout();
+      },
 
+      copyToClipboard: function(text) {
+        var dummy = document.createElement("input");
+        document.body.appendChild(dummy);
+        dummy.setAttribute("value", text);
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
     },
 
     codeOutput: function() {
       if (this.$cacheElMain === this.$target) return;
       this.$cacheElMain = this.$target;
 
-      var fullCode = this.stringified
-        .slice(0, this.stringified.indexOf('>') + 1)
-        .replace(/ xmlns="[^"]*"/, '');
+        var fullCode = this.stringified;
 
       this.$code.innerText = fullCode; // set full element code
       this.highlight(); // highlight element
